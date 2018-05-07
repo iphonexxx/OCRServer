@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 from flask import Flask
 from flask_restful import Api
-from restapi import ExtractImage2, Ocr2, CompressImage, DetectType2, recognize
+from restapi import ExtractImage2, Ocr2, CompressImage, DetectType2, DetectType3, recognize
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
@@ -31,6 +30,8 @@ api.add_resource(CompressImage.CompressImageApi, '/api/compress_image')
 logging.debug('Load Recongize Config: %s' % str(recognize.getConfig()))
 
 if __name__ == '__main__':
-    http_server = HTTPServer(WSGIContainer(app))
-    http_server.listen(5000)
-    IOLoop.instance().start()
+    obj = DetectType3.DetectType3Api()
+    obj.post()
+    #http_server = HTTPServer(WSGIContainer(app))
+    #http_server.listen(5000)
+    #IOLoop.instance().start()

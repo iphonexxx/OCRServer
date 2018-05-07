@@ -4,6 +4,7 @@
 import cv2
 import numpy as np
 import os
+import io
 import random
 import requests
 import pickle
@@ -52,7 +53,6 @@ ROI_STYLE_BLUE_FONT = 'blue-font'
 ROI_STYLE_BLUE_FONT_ENHANCE = 'blue-font-enhance'
 
 DEFAULT_ROI_STYLE = ROI_STYLE_BLACK_FONT
-
 
 def rotateAndScale(img, scaleFactor=1, degreesCCW=30, flags=cv2.INTER_CUBIC):
     (oldY, oldX, channels) = img.shape  # note: numpy uses (y,x) convention but most OpenCV functions use (x,y)
@@ -262,7 +262,6 @@ original_open = open
 def bin_open(filename, mode='rb'):  # note, the default mode now opens in binary
     return original_open(filename, mode)
 
-
 def callOcr(roi, job_id, roi_config):
     roi_type = roi_config.get('type', DEFAULT_ROI_TYPE)
     type_config = OCR_TYPE_MAPPING.get(roi_type)
@@ -281,7 +280,7 @@ def callOcr(roi, job_id, roi_config):
             ipl_img = PIL.Image.fromarray(cv2.cvtColor(ocr_img, cv2.COLOR_BGR2RGB))
             t_bts = pytesseract.image_to_string(ipl_img, lang='eng')
 
-            t_str = str(t_bts, 'cp1252', 'ignore')
+            t_str = str(t_bts).encode('cp1252')
 
             logging.info('OCR Tesseract: %s' % str(t_str))
 
@@ -364,9 +363,9 @@ def extractText2BlackImage(img, roi_style=DEFAULT_ROI_STYLE, job_id=None, roi_na
 
     if roi_style == ROI_STYLE_BLACK_FONT:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
         ret, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         return cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
     elif roi_style == ROI_STYLE_BLUE_FONT_ENHANCE:
         img2 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -624,7 +623,7 @@ def loadJobData(job_id):
     dirName = TMP_DIR + '/' + job_id
     fileName = dirName + '/data.yaml'
 
-    f = open(fileName, encoding='utf-8')
+    f = io.open(fileName, encoding='utf-8')
     data = yaml.safe_load(f)
     f.close()
 
@@ -638,7 +637,7 @@ def saveJobData(data, job_id):
     if not os.path.exists(dirName):
         os.makedirs(dirName)
 
-    f = open(fileName, mode='w', encoding='utf-8')
+    f = io.open(fileName, mode='w', encoding='utf-8')
 
     yaml.safe_dump(data, f, default_flow_style=False, encoding='utf-8')
 

@@ -2,18 +2,20 @@
 # -*- coding: utf-8 -*-
 
 import yaml
+import io
 
-CONFIG_PATH = './recognize/config.yaml'
+CONFIG_PATH = './recognize/config1.yaml'
 
 CONFIG_DATA = {}
 
 
 def loadConfig():
     global CONFIG_DATA
-    f = open(CONFIG_PATH, encoding='utf-8')
+    f = io.open(CONFIG_PATH, encoding='utf-8')
     CONFIG_DATA = yaml.safe_load(f)
     f.close()
 
+    print(CONFIG_DATA)
     for name in CONFIG_DATA:
         config = CONFIG_DATA[name]
 
@@ -40,3 +42,5 @@ def loadConfig():
 def getConfig():
     return CONFIG_DATA
 
+#if __name__ == "__main__":
+#    loadConfig() 
