@@ -285,6 +285,7 @@ def callOcr(roi, job_id, roi_config):
             logging.info('OCR Tesseract: %s' % str(t_str))
 
             text_lines = []
+            t_str = t_str.decode()
             for line in t_str.split("\n"):
                 trim_line = line.strip()
                 if trim_line != '':

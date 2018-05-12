@@ -39,6 +39,11 @@ class DetectType3Api(Resource):
     }
 
     '''
+    def post2(self, strJobId, strFilePath):
+        self.mStrJobID = strJobId
+        self.mFilePath = strFilePath
+        self.post()
+        pass
 
     def post(self):
         #json_data = request.get_json(force=True)
@@ -51,11 +56,12 @@ class DetectType3Api(Resource):
         #job_id = json_data['job_id']
         #file_path = json_data['file_path']
 
-	job_id = 1003
+        job_id = self.mStrJobID
         #img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
         #img = cv2.imread("/home/john/sources/opencv/tests/shapedection/fapiao1.png", cv2.IMREAD_UNCHANGED)
-	img = cv2.imread("/home/john/sources/OCRServer/ocr_server/recognize/cn_vat_sh/fapiao1.png", cv2.IMREAD_UNCHANGED)
-	#img = cv2.imread("/home/john/sources/opencv/tests/threshold_test/fapiao1.png", cv2.IMREAD_UNCHANGED)
+        #img = cv2.imread("/home/hello/work/OCRServer/inv_img/1001_IMG_1840.JPG", cv2.IMREAD_UNCHANGED)
+        img = cv2.imread(self.mFilePath, cv2.IMREAD_UNCHANGED)
+	    #img = cv2.imread("/home/john/sources/opencv/tests/threshold_test/fapiao1.png", cv2.IMREAD_UNCHANGED)
 
         logging.info('Original image size : %s' % ((img.shape[1], img.shape[0]) ,))
 
@@ -138,7 +144,7 @@ class DetectType3Api(Resource):
 
         logging.debug("End match feature")
 
-	print("cur_polygons =>", polygons)
+        print("cur_polygons =>", polygons)
 
         if not cur_match_type_name:
             logging.info("No feature matched")
@@ -154,14 +160,14 @@ class DetectType3Api(Resource):
         perspective_img = None
 
         if cur_config['rotate'] == 'perspective':
-	    print("image shape =>", image.shape)
-	    print("cur_config[image_w] =>", cur_config['image']['w'], 
-		  "cur_config[image_h] =>", cur_config['image']['h'])
+            #print("image shape =>", image.shape)
+	        #print("cur_config[image_w] =>", cur_config['image']['w'], 
+		  #"cur_config[image_h] =>", cur_config['image']['h'])
             perspective_img = cv2.warpPerspective(image, cur_match_M,
                                                   (cur_config['image']['w'], cur_config['image']['h']),
                                                   flags=cv2.INTER_LANCZOS4)
 
-	    print("perspective_img.shape =>", perspective_img.shape)
+	        #print("perspective_img.shape =>", perspective_img.shape)
             tools.writeImageJob(perspective_img, str(job_id) + '/step1', '2 perspective-%s' % cur_match_type_name)
         else:
             logging.error('rotate %s is not supported' % cur_config['rotate'])
@@ -177,20 +183,21 @@ class DetectType3Api(Resource):
         ############################################
         # 3. extract the validate area
         ############################################
-        validate_roi_name = cur_config['validate']['roi']
+        validate_roi_names = cur_config['validate']['roi']
 
-        validate_roi_config = cur_config['roi'].get(validate_roi_name, None)
+        for validate_roi_name in validate_roi_names:
+            validate_roi_config = cur_config['roi'].get(validate_roi_name, None)
 
-        if not validate_roi_config:
-            logging.error('Validate ROI[%s] not exist in roi section' % validate_roi_name)
+            if not validate_roi_config:
+                logging.error('Validate ROI[%s] not exist in roi section' % validate_roi_name)
 
-        validate_roi, validate_roi_path = tools.createRoi2(perspective_img, validate_roi_name, validate_roi_config,
+            validate_roi, validate_roi_path = tools.createRoi2(perspective_img, validate_roi_name, validate_roi_config,
                                                            str(job_id) + '/step1')
-        orc_result = tools.callOcr(validate_roi, str(job_id) + '/step1', validate_roi_config)
+            orc_result = tools.callOcr(validate_roi, job_id + '/step1', validate_roi_config)
 
-        logging.info('Validate ROI OCR result = %s' % orc_result)
+            logging.info('Validate ROI OCR result = %s' % orc_result)
 
-	return 
+        return 
 
         ############################################
         # 4. create compress jpg image
@@ -326,10 +333,10 @@ class DetectType3Api(Resource):
                 [imageConfig['w'] - featureConfig['x'] - 1, imageConfig['h'] - featureConfig['y'] - 1],
                 [imageConfig['w'] - featureConfig['x'] - 1, -1 * featureConfig['y']]]) \
                 .reshape(-1, 1, 2)
-	    print("normalized_pts =>", normalized_pts)
+	    #print("normalized_pts =>", normalized_pts)
 
             normalized_dst = cv2.perspectiveTransform(normalized_pts, M)
-	    print("normalized_pts after perspectiveTransform =>", normalized_dst)
+	    #print("normalized_pts after perspectiveTransform =>", normalized_dst)
             cv2.polylines(img_detect, [np.int32(normalized_dst)], True, 255, 3)
 
             # add offset to src_pts so that it can create right matrix
@@ -337,8 +344,8 @@ class DetectType3Api(Resource):
                 p[0][0] += featureConfig.get('x', 0)
                 p[0][1] += featureConfig.get('y', 0)
 
-	    print("src_pts =>", src_pts)
-	    print("dst_pts =>", dst_pts)
+	    #print("src_pts =>", src_pts)
+	    #print("dst_pts =>", dst_pts)
             M2, mask2 = cv2.findHomography(dst_pts, src_pts, cv2.RANSAC, 5.0)
 
             normalized_polygons = []

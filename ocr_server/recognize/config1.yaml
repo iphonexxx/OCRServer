@@ -21,14 +21,22 @@ cn_vat_sh:
     y: 21
     w: 1105
     h: 553
-    file: ./recognize/cn_vat_sh/feature3.png
+    #x: 10
+    #y: 11
+    #w: 1148
+    #h: 724
+    file: ./recognize/cn_vat_sh/feature6.png
     option:       # 针对特征匹配的选项, 可选
       minMatchCount: 30
       matchDistance: 0.7
 
   rotate: perspective    # 图片旋转的方法，可选有 'line' (按发票进行旋转), 'perspective' (默认，使用特征匹配进行旋转）
   validate:       # 此种图像的验证方式，会把相应信息返回给接口
-    roi: DocType  # 相对应的roi的名字，在roi块中定义的
+    roi: 
+      DocType:  # 相对应的roi的名字，在roi块中定义的
+      DocCode:
+      Buyer:
+      DocNumber:    
   roi: #roi是感兴趣的区域，需要系统提取的
     Buyer:
       type: text    # text/number/date/currency 这里主要的内容类型。准确的设置值可以提高识别率，如ORC效果。默认text(简体中文)
