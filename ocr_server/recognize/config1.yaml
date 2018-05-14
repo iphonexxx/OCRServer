@@ -25,7 +25,7 @@ cn_vat_sh:
     #y: 11
     #w: 1148
     #h: 724
-    file: ./recognize/cn_vat_sh/feature6.png
+    file: ./recognize/cn_vat_sh/feature9.png
     option:       # 针对特征匹配的选项, 可选
       minMatchCount: 30
       matchDistance: 0.7
@@ -36,7 +36,8 @@ cn_vat_sh:
       DocType:  # 相对应的roi的名字，在roi块中定义的
       DocCode:
       Buyer:
-      DocNumber:    
+      DocNumber:
+      Total:      
   roi: #roi是感兴趣的区域，需要系统提取的
     Buyer:
       type: text    # text/number/date/currency 这里主要的内容类型。准确的设置值可以提高识别率，如ORC效果。默认text(简体中文)

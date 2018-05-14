@@ -280,18 +280,20 @@ def callOcr(roi, job_id, roi_config):
             ipl_img = PIL.Image.fromarray(cv2.cvtColor(ocr_img, cv2.COLOR_BGR2RGB))
             t_bts = pytesseract.image_to_string(ipl_img, lang='eng')
 
-            t_str = str(t_bts).encode('cp1252')
+            t_str = str(t_bts).encode('cp1252', errors="replace")
+            #encode(sys.stdout.encoding, errors='replace')
 
             logging.info('OCR Tesseract: %s' % str(t_str))
 
             text_lines = []
-            t_str = t_str.decode()
-            for line in t_str.split("\n"):
-                trim_line = line.strip()
-                if trim_line != '':
-                    # remove prefix and surfix
-                    if trim_line.find(u"中中") < 0 and trim_line.find(u"dddd") < 0:
-                        text_lines.append(trim_line)
+            #print("=============>", type(t_str))
+            #t_str = t_str.decode()
+            #for line in t_str.split("\n"):
+            #    trim_line = line.strip()
+            #    if trim_line != '':
+            #        # remove prefix and surfix
+            #        if trim_line.find(u"中中") < 0 and trim_line.find(u"dddd") < 0:
+            #            text_lines.append(trim_line)
 
             return text_lines
         finally:

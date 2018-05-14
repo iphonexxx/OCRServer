@@ -61,14 +61,13 @@ def main():
     nIndex = 0
     for imgFile in lstVaildImgFiles:
         print(imgFile)
-        #print(jwkj_get_filePath_fileName_fileExt(imgFile))
         #if os.path.exists(imgFile)
         #    continue;
         nIndex = nIndex + 1
-        if nIndex > 10:
+        if nIndex >= 20:
             break;
 
-        strJobID = jwkj_get_filePath_fileName_fileExt(imgFile)
+        strJobID = get_filePath_fileName(imgFile)
         print(strJobID)
         strFilePath = imgFile
         obj.post2(strJobID, strFilePath)
@@ -76,13 +75,13 @@ def main():
 
 def test():
     obj = DetectType3.DetectType3Api()
-    strJobID = "0001001"
+    strJobID = "f4f87396eece404131ff119bd181ee3a"
     print(strJobID)
-    strFilePath = "/home/hello/work/OCRServer/inv_img/2bd5bcf0af394b01742791ef6587bbaf.jpg"
+    strFilePath = "/home/hello/work/OCRServer/inv_img/f4f87396eece404131ff119bd181ee3a.jpg"
     obj.post2(strJobID, strFilePath)
     pass
 
 
 if __name__ == '__main__':
-    #main();
-    test();
+    main();
+    #test();
